@@ -55,7 +55,9 @@ Question 5. a) Which city is the least profitable (in terms of average profit) i
 
 Question 6. a) Which product subcategory has the highest average profit in Australia? 
 
-Question 7. a)Who are the most valuable customers and what do they purchase? 
+Question 7. a)Who are the most valuable customers and what do they purchase?
+
+All SQL queries can be found in [queries.sql](https://github.com/vivienne1234/Global-Superstore-Analysis/blob/main/Global%20superstore%20SQL%20queries.txt)
 
 ## Analysis and Findings
 
@@ -65,12 +67,6 @@ a) What are the three countries that generated the highest total profit for Glob
 
 From the query results, analysis of the 2014 sales data revealed that the United States generated the highest total profit for Global Superstore, amounting to $93,507.55. Following at a distant second was India, with total profits of $48,807.67, while China ranked third with $46,793.99. The United States’ performance was particularly notable, delivering almost twice the profit of India and significantly outperforming China, indicating a dominant contribution to the company’s global profitability in that year
 
-SELECT TOP 3 Country, SUM(Profit) AS Total_Profit
-FROM Global_Superstore2
-WHERE YEAR(Order_date)= 2014
-GROUP BY Country
-ORDER BY SUM(Profit) DESC
-
 b) For each of these three countries, find the three products with the highest total profit. Specifically, what are the products’ names and the total profit for each product? 
 
 Further analysis of the top-performing countries in 2014 reveals distinct product drivers behind their profitability.
@@ -79,33 +75,36 @@ In India, the most profitable items were the Sauder Classic Bookcase ($2,419.65)
 For the United States, the top profit-generating products were the Canon imageCLASS 2200 Advanced Copier ($15,679.96), the Hewlett Packard LaserJet 3310 Printer ($3,623.94), and the GBC DocuBind TL300 Electric Binding Machine ($1,910.58).
 These findings highlight that while China and India’s top profits came from a mix of office furniture and electronics, the United States’ profits were heavily driven by high-value office technology products.
 
-WITH Highest_Country AS (
-SELECT TOP 3 Country, SUM(Profit) AS Total_Profit
-FROM Global_Superstore2
-WHERE YEAR(Order_date)= 2014
-GROUP BY Country
-ORDER BY SUM(Profit) DESC
-),
-TOP_PRODUCT AS (
-SELECT P.Country,P.Product_Name, SUM(Profit) AS Total_Profit
-FROM Global_Superstore2 P
-JOIN Highest_Country H
-ON  H.Country=P.Country
-WHERE YEAR(Order_date)= 2014
-GROUP BY P.Country, P.Product_Name
-),
-Product_Rank AS (
-SELECT *,
-ROW_NUMBER() OVER (PARTITION BY Country ORDER BY Total_profit DESC) AS rnk
-FROM TOP_PRODUCT
-)
-SELECT *
-FROM Product_Rank
-WHERE rnk<=3
 
+### Question 2
 
+a) Identify the 3 subcategories with the highest average shipping cost in the United States. 
 
+In 2014, shipping cost analysis for the United States revealed that certain product subcategories incur significantly higher logistics expenses. The three subcategories with the highest average shipping cost were:
 
+Copiers – averaging $165.29 per shipment
+
+Machines – averaging $132.25 per shipment
+
+Tables – averaging $69.95 per shipment
+
+The substantial shipping cost for Copiers and Machines likely reflects their weight, bulk, and need for specialized handling, while Tables also incur elevated costs due to size and packaging requirements
+
+### Question 3
+
+Assess Nigeria’s profitability (i.e., total profit) for 2014. How does it compare to other African countries? 
+
+In 2014, Nigeria recorded a total profit of -$23,285.25, making it one of the poorest-performing markets for Global Superstore in Africa. This was a stark contrast to several neighboring countries that achieved positive results.
+
+For example:
+
+Ghana generated $2,775.06, outperforming Nigeria by over $26,000.
+
+Mozambique earned $2,440.80, exceeding Nigeria’s performance by roughly $25,700.
+
+Even smaller markets such as Mauritania ($1,033.62) and Côte d’Ivoire ($2,537.67) outperformed Nigeria by significant margins.
+
+The data highlights a serious profitability gap, indicating that Nigeria’s operations not only underperformed relative to its peers but also contributed a substantial loss to the region’s overall results.
 
 
 
