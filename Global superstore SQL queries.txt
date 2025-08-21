@@ -1,0 +1,147 @@
+SELECT * 
+FROM Global_Superstore2;
+
+--a) What are the three countries that generated the highest total profit for Global Superstore in 2014?
+SELECT TOP 3 Country, SUM(Profit) AS Total_Profit
+FROM Global_Superstore2
+WHERE YEAR(Order_date)= 2014
+GROUP BY Country
+ORDER BY SUM(Profit) DESC
+
+--b) For each of these three countries, find the three products with the highest total profit. Specifically, what are the products’ names and the total profit for each product?  
+WITH Highest_Country AS (
+SELECT TOP 3 Country, SUM(Profit) AS Total_Profit
+FROM Global_Superstore2
+WHERE YEAR(Order_date)= 2014
+GROUP BY Country
+ORDER BY SUM(Profit) DESC
+),
+TOP_PRODUCT AS (
+SELECT P.Country,P.Product_Name, SUM(Profit) AS Total_Profit
+FROM Global_Superstore2 P
+JOIN Highest_Country H
+ON  H.Country=P.Country
+WHERE YEAR(Order_date)= 2014
+GROUP BY P.Country, P.Product_Name
+),
+Product_Rank AS (
+SELECT *,
+ROW_NUMBER() OVER (PARTITION BY Country ORDER BY Total_profit DESC) AS rnk
+FROM TOP_PRODUCT
+)
+SELECT *
+FROM Product_Rank
+WHERE rnk<=3
+
+--Question 2.  
+--a) Identify the 3 subcategories with the highest average shipping cost in the United States. 
+SELECT TOP 3 Sub_Category, Avg(Shipping_Cost) AS AVG_Shipping_Cost
+FROM Global_Superstore2
+WHERE Country = 'United States'
+GROUP BY Sub_Category
+ORDER BY AVG(Shipping_Cost) DESC
+
+--Question 3.  
+--a) Assess Nigeria’s profitability (i.e., total profit) for 2014. How does it compare to other African countries?  
+WITH Nigerias_profitability AS(
+SELECT SUM(Profit) AS Nigeria_Profit
+From Global_Superstore2
+WHERE Country ='Nigeria' AND YEAR(Order_Date) = 2014
+GROUP BY Country
+)
+SELECT P.Country, SUM(Profit) AS Total_Profit,N. Nigeria_Profit, (SUM(Profit) - N.Nigeria_Profit) AS Difference_From_Nigeria
+From Global_Superstore2 P
+CROSS JOIN Nigerias_profitability N
+WHERE Country !='Nigeria' AND YEAR(Order_Date) = 2014 AND Region LIKE '%Africa%'
+GROUP BY Country,N. Nigeria_Profit;
+
+--b) What factors might be responsible for Nigeria’s poor performance? You might want to investigate shipping costs and the average discount as potential root causes.
+WITH CountryStats AS (
+    SELECT 
+        Country,
+        ROUND(AVG(Shipping_Cost), 2) AS Avg_Shipping_Cost,
+        ROUND(AVG(Discount), 2) AS Avg_Discount,
+        ROUND(SUM(Profit) / NULLIF(SUM(Sales), 0), 4) AS Profit_Margin
+    FROM Global_Superstore2
+    WHERE YEAR(Order_Date) = 2014
+      AND Region LIKE '%Africa%'
+    GROUP BY Country
+)
+SELECT *
+FROM CountryStats
+ORDER BY Avg_Discount DESC;
+
+--Question 4.  
+--a) Identify the product subcategory that is the least profitable in Southeast Asia.  
+--Note: For this question, assume that Southeast Asia comprises Cambodia, Indonesia, Malaysia, Myanmar (Burma), the Philippines, Singapore, Thailand, and Vietnam.  
+SELECT TOP 1 Sub_category, Region, SUM(Profit)
+FROM Global_Superstore2
+WHERE Region LIKE '%Southeast Asia%' 
+GROUP BY Sub_Category, Region
+ORDER BY  SUM(Profit)
+
+--b) Is there a specific country in Southeast Asia where Global Superstore should stop offering the subcategory identified in 4a?  
+SELECT  TOP 1 Country, Sub_category, SUM(Profit) AS Total_Profit
+FROM Global_Superstore2
+WHERE Region LIKE '%Southeast Asia%' AND Sub_category ='Tables'
+GROUP BY Sub_Category, Country
+ORDER BY  SUM(Profit);
+
+--Question 5.  
+--a) Which city is the least profitable (in terms of average profit) in the United States? For this analysis, discard the cities with less than 10 Orders. 
+SELECT TOP 1 City, AVG(Profit) AS Avg_Profit, Count(order_id) AS Order_count
+FROM Global_Superstore2 
+WHERE Country = 'United States'
+GROUP BY City, Country
+HAVING  Count(order_id)>10
+ORDER BY AvG(Profit)
+
+-- b) Why is this city’s average profit so low?  
+SELECT  
+    City,
+    ROUND(AVG(Profit),2) AS Avg_Profit, 
+    COUNT(Order_ID) AS Order_Count, 
+    ROUND(AVG(Discount), 2) AS Avg_Discount, 
+    ROUND(AVG(Shipping_Cost), 2) AS Avg_Ship_Cost,
+    SUM(Sales) AS Total_Sales,
+    ROUND(SUM(Profit) / NULLIF(SUM(Sales), 0), 4) AS Profit_Margin
+FROM Global_Superstore2
+WHERE City = 'Lancaster'
+GROUP BY City
+ORDER BY AVG(Profit) ASC;
+
+--Question 6.  
+--a) Which product subcategory has the highest average profit in Australia?  
+SELECT TOP 1 Sub_Category, Avg(Profit) AS AVG_Profit
+FROM Global_Superstore2
+WHERE Country = 'Australia'
+GROUP BY Sub_Category
+ORDER BY AVG(Profit) DESC
+
+--Question 7.  
+--a)Who are the most valuable customers and what do they purchase?  
+WITH TopCustomers AS (
+    SELECT TOP 3 
+        Customer_Name,
+        SUM(Profit) AS Total_Profit
+    FROM Global_Superstore2
+    GROUP BY Customer_Name
+    ORDER BY Total_Profit DESC
+)
+-- Step 2: See what they buy with total profit column
+SELECT 
+    g.Customer_Name, 
+    g.Category, 
+    t.Total_Profit,
+    g.Product_Name, 
+    ROUND(AVG(g.Profit), 2) AS Avg_Profit, 
+    COUNT(g.Order_ID) AS Order_Count, 
+    ROUND(AVG(g.Discount), 2) AS Avg_Discount, 
+    ROUND(AVG(g.Shipping_Cost), 2) AS Avg_Ship_Cost,
+    SUM(g.Sales) AS Total_Sales,
+    ROUND(SUM(g.Profit) / NULLIF(SUM(g.Sales), 0), 4) AS Profit_Margin
+FROM Global_Superstore2 g
+JOIN TopCustomers t
+    ON g.Customer_Name = t.Customer_Name
+GROUP BY g.Customer_Name, g.Category, t.Total_Profit, g.Product_Name
+ORDER BY t.Total_Profit DESC, g.Customer_Name;
