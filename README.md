@@ -176,7 +176,37 @@ Implication: These high-value customers are prime candidates for loyalty program
 
 ## Dashboard
 
-https://github.com/vivienne1234/Global-Superstore-Analysis/blob/main/Global%20dashboard.png
+![Image](https://github.com/vivienne1234/Global-Superstore-Analysis/blob/main/Global%20dashboard.png?raw=true)
+
+Click [HERE](https://app.powerbi.com/links/xttpePhFeZ?ctid=c470f255-2be6-4283-868b-c8acfb65ec7b&pbi_source=linkShare&bookmarkGuid=5a1047da-442c-4d24-bbd0-d99ccda74866) to view the Interactive dashboard
+
+
+## Recommendation
+
+The analysis reveals several key insights into profitability, product performance, and customer value:
+
+- Product-Level Actions
+  
+Tables stand out as a consistently underperforming sub-category, with significant losses in multiple regions, especially Indonesia in Southeast Asia.
+Immediate review of the pricing, supplier agreements, and logistics for this sub-category is necessary. If improvement measures fail, phasing out Tables in unprofitable markets should be prioritized.
+
+- Regional Optimization
+  
+Regions and cities with negative profit margins (e.g., Lancaster in 5b) should be closely examined for causes such as excessive discounts, high shipping costs, or poor demand.
+Marketing efforts and product mix should be tailored to high-performing areas while scaling back in loss-making ones.
+
+- Customer Retention & Upselling
+  
+The top customers; Tamara Chand, Raymond Buch, and Sanjit Chand, generate substantial profits across categories.
+A loyalty program, personalized offers, or priority services for these high-value customers could further strengthen their retention and increase lifetime value.
+
+- Sub-Category Growth
+
+High-profit sub-categories like Appliances (139.02 average profit) should receive increased promotional and stocking priority in both physical and online channels.
+
+- Strategic Direction:
+
+Focus on profitable sub-categories and top customers, aggressively cut or optimize loss-making products in specific regions, and leverage data-driven targeting to allocate marketing spend where it delivers the highest ROI. This approach will not only reduce waste but also improve the overall profit margin.
 
 
 
